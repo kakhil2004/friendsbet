@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const PUBLIC_PATHS = ["/login", "/api/auth/login"];
+const OG_PATHS = ["/market/", "/profile/"];
+
+function isBot(request: NextRequest): boolean {
+  const ua = request.headers.get("user-agent") || "";
+  return /Discordbot|facebookexternalhit|Twitterbot|LinkedInBot|Slackbot|WhatsApp|TelegramBot/i.test(ua);
+}
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -11,6 +17,11 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/favicon") ||
     pathname.includes(".")
   ) {
+    return NextResponse.next();
+  }
+
+  // Allow bots through on market/profile pages for OG previews
+  if (isBot(request) && OG_PATHS.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
   }
 

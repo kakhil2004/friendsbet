@@ -53,12 +53,20 @@ export async function POST(request: NextRequest) {
   await withLock<Market>("markets", (markets) => [...markets, newMarket]);
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const fields = [];
+  if (newMarket.description) {
+    fields.push({ name: "Description", value: newMarket.description, inline: false });
+  }
+  if (newMarket.closesAt) {
+    fields.push({ name: "Betting Closes", value: `<t:${Math.floor(new Date(newMarket.closesAt).getTime() / 1000)}:R>`, inline: true });
+  }
+  fields.push({ name: "Place Your Bets", value: `[Open Market](${baseUrl}/market/${newMarket.id})`, inline: true });
+
   sendDiscordNotification({
-    title: newMarket.question,
-    description: newMarket.description || undefined,
-    url: `${baseUrl}/market/${newMarket.id}`,
+    title: `New Market: ${newMarket.question}`,
     color: 0x3b82f6, // blue
-    footer: { text: "New market created" },
+    fields,
+    footer: { text: "FriendBets" },
   });
 
   return NextResponse.json(newMarket, { status: 201 });

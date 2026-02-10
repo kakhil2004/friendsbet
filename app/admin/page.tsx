@@ -77,7 +77,7 @@ export default function AdminPage() {
       body: JSON.stringify({
         question: newQuestion.trim(),
         description: newDescription.trim(),
-        closesAt: newClosesAt || undefined,
+        closesAt: newClosesAt ? new Date(newClosesAt).toISOString() : undefined,
       }),
     });
     if (!res.ok) {
@@ -107,7 +107,7 @@ export default function AdminPage() {
     const res = await fetch(`/api/admin/markets/${id}/timer`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ closesAt: editTimerValue || null }),
+      body: JSON.stringify({ closesAt: editTimerValue ? new Date(editTimerValue).toISOString() : null }),
     });
     if (!res.ok) {
       const data = await res.json();
@@ -308,7 +308,13 @@ export default function AdminPage() {
                         <button
                           onClick={() => {
                             setEditingTimer(editingTimer === market.id ? null : market.id);
-                            setEditTimerValue(market.closesAt ? new Date(market.closesAt).toISOString().slice(0, 16) : "");
+                            if (market.closesAt) {
+                              const d = new Date(market.closesAt);
+                              const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+                              setEditTimerValue(local);
+                            } else {
+                              setEditTimerValue("");
+                            }
                           }}
                           className="px-3 py-1 text-sm bg-yellow-800 hover:bg-yellow-700 text-yellow-200 rounded transition-colors"
                         >

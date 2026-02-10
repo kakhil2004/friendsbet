@@ -88,12 +88,22 @@ export async function POST(
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const losingPool = totalPool - winningPool;
+  const winnerCount = Object.keys(payouts).length;
+
   sendDiscordNotification({
-    title: (resolved as Market).question,
-    description: `Resolved: **${outcome.toUpperCase()}** | Pool: ${totalPool} coins`,
-    url: `${baseUrl}/market/${params.id}`,
-    color: outcome === "yes" ? 0x22c55e : 0xef4444, // green or red
-    footer: { text: "Market resolved" },
+    title: `Resolved: ${(resolved as Market).question}`,
+    description: outcome === "yes"
+      ? "The answer was **YES**"
+      : "The answer was **NO**",
+    color: outcome === "yes" ? 0x22c55e : 0xef4444,
+    fields: [
+      { name: "Total Pool", value: `${totalPool} coins`, inline: true },
+      { name: "Winners", value: `${winnerCount} ${winnerCount === 1 ? "player" : "players"}`, inline: true },
+      { name: "Losing Side Pool", value: `${losingPool} coins redistributed`, inline: true },
+      { name: "View Results", value: `[Open Market](${baseUrl}/market/${params.id})`, inline: false },
+    ],
+    footer: { text: "FriendBets" },
   });
 
   return NextResponse.json({
