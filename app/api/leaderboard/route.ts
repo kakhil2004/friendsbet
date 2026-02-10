@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
 
   const users = readData<User>("users");
   const leaderboard = users
+    .filter((u) => !u.isAdmin)
     .map((u) => ({
       id: u.id,
       displayName: u.displayName,

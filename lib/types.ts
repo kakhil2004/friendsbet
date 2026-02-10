@@ -13,6 +13,7 @@ export interface Market {
   description: string;
   status: "open" | "resolved";
   resolvedOutcome: "yes" | "no" | null;
+  closesAt: string | null;
   createdAt: string;
   resolvedAt: string | null;
 }

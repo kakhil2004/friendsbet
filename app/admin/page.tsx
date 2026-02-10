@@ -17,6 +17,7 @@ interface Market {
   description: string;
   status: "open" | "resolved";
   resolvedOutcome: "yes" | "no" | null;
+  closesAt: string | null;
   createdAt: string;
 }
 
@@ -26,6 +27,9 @@ export default function AdminPage() {
   const [newUserName, setNewUserName] = useState("");
   const [newQuestion, setNewQuestion] = useState("");
   const [newDescription, setNewDescription] = useState("");
+  const [newClosesAt, setNewClosesAt] = useState("");
+  const [editingTimer, setEditingTimer] = useState<string | null>(null);
+  const [editTimerValue, setEditTimerValue] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
 
@@ -73,6 +77,7 @@ export default function AdminPage() {
       body: JSON.stringify({
         question: newQuestion.trim(),
         description: newDescription.trim(),
+        closesAt: newClosesAt || undefined,
       }),
     });
     if (!res.ok) {
@@ -81,6 +86,7 @@ export default function AdminPage() {
     }
     setNewQuestion("");
     setNewDescription("");
+    setNewClosesAt("");
     fetchData();
   }
 
@@ -94,6 +100,22 @@ export default function AdminPage() {
       setError("Failed to resolve market");
       return;
     }
+    fetchData();
+  }
+
+  async function updateTimer(id: string) {
+    const res = await fetch(`/api/admin/markets/${id}/timer`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ closesAt: editTimerValue || null }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      setError(data.error || "Failed to update timer");
+      return;
+    }
+    setEditingTimer(null);
+    setEditTimerValue("");
     fetchData();
   }
 
@@ -204,6 +226,15 @@ export default function AdminPage() {
             rows={3}
             className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
           />
+          <div>
+            <label className="text-sm text-gray-400 mb-1 block">Betting cutoff (optional)</label>
+            <input
+              type="datetime-local"
+              value={newClosesAt}
+              onChange={(e) => setNewClosesAt(e.target.value)}
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+          </div>
           <button
             type="submit"
             disabled={!newQuestion.trim()}
@@ -242,11 +273,47 @@ export default function AdminPage() {
                       {market.status === "resolved"
                         ? `Resolved: ${market.resolvedOutcome?.toUpperCase()}`
                         : "Open"}
+                      {market.status === "open" && market.closesAt && (
+                        <span className="ml-2 text-yellow-400">
+                          Closes: {new Date(market.closesAt).toLocaleString()}
+                        </span>
+                      )}
                     </p>
+                    {market.status === "open" && editingTimer === market.id && (
+                      <div className="flex gap-2 mt-2">
+                        <input
+                          type="datetime-local"
+                          value={editTimerValue}
+                          onChange={(e) => setEditTimerValue(e.target.value)}
+                          className="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-gray-100 text-xs focus:outline-none"
+                        />
+                        <button
+                          onClick={() => updateTimer(market.id)}
+                          className="px-2 py-1 text-xs bg-primary-700 hover:bg-primary-600 text-white rounded"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => { setEditingTimer(null); setEditTimerValue(""); }}
+                          className="px-2 py-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center gap-2 ml-4 shrink-0">
                     {market.status === "open" && (
                       <>
+                        <button
+                          onClick={() => {
+                            setEditingTimer(editingTimer === market.id ? null : market.id);
+                            setEditTimerValue(market.closesAt ? new Date(market.closesAt).toISOString().slice(0, 16) : "");
+                          }}
+                          className="px-3 py-1 text-sm bg-yellow-800 hover:bg-yellow-700 text-yellow-200 rounded transition-colors"
+                        >
+                          Timer
+                        </button>
                         <button
                           onClick={() => resolveMarket(market.id, "yes")}
                           className="px-3 py-1 text-sm bg-green-800 hover:bg-green-700 text-green-200 rounded transition-colors"

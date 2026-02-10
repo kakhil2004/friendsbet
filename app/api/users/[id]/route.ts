@@ -23,9 +23,9 @@ export async function GET(
   );
   const markets = readData<Market>("markets");
 
-  // Calculate rank
-  const sorted = [...users].sort((a, b) => b.balance - a.balance);
-  const rank = sorted.findIndex((u) => u.id === params.id) + 1;
+  // Calculate rank (exclude admins)
+  const sorted = [...users].filter((u) => !u.isAdmin).sort((a, b) => b.balance - a.balance);
+  const rank = targetUser.isAdmin ? 0 : sorted.findIndex((u) => u.id === params.id) + 1;
 
   const betsWithDetails = allBets
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())

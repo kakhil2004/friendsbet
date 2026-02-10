@@ -61,6 +61,9 @@ export async function POST(request: Request) {
   if (market.status !== "open") {
     return NextResponse.json({ error: "Market is not open" }, { status: 400 });
   }
+  if (market.closesAt && new Date() >= new Date(market.closesAt)) {
+    return NextResponse.json({ error: "Betting is closed" }, { status: 400 });
+  }
 
   // Check balance (read fresh data)
   const users = readData<User>("users");

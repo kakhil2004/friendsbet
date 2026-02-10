@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
 import { readData, withLock } from "@/lib/storage";
+import { sendDiscordNotification } from "@/lib/discord";
 import type { Market, Bet, User } from "@/lib/types";
 
 export async function POST(
@@ -85,6 +86,15 @@ export async function POST(
       })
     );
   }
+
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  sendDiscordNotification({
+    title: (resolved as Market).question,
+    description: `Resolved: **${outcome.toUpperCase()}** | Pool: ${totalPool} coins`,
+    url: `${baseUrl}/market/${params.id}`,
+    color: outcome === "yes" ? 0x22c55e : 0xef4444, // green or red
+    footer: { text: "Market resolved" },
+  });
 
   return NextResponse.json({
     ...(resolved as Market),

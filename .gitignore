@@ -6,3 +6,4 @@ data/
 .claude/
 plans/
 nul
+.env$

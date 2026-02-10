@@ -8,6 +8,11 @@ seedAdminIfNeeded();
 export const metadata: Metadata = {
   title: "FriendBets",
   description: "Prediction market for friends",
+  openGraph: {
+    siteName: "FriendBets",
+    title: "FriendBets",
+    description: "Prediction market for friends — bet on outcomes with your crew",
+  },
 };
 
 export default function RootLayout({
