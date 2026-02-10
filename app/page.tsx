@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
 interface MarketWithPool {
@@ -8,6 +8,7 @@ interface MarketWithPool {
   question: string;
   status: "open" | "resolved";
   resolvedOutcome: "yes" | "no" | null;
+  closesAt: string | null;
   createdAt: string;
   yesPool: number;
   noPool: number;
@@ -102,12 +103,43 @@ export default function Home() {
   );
 }
 
+function useCountdown(closesAt: string | null) {
+  const format = useCallback((ms: number) => {
+    if (ms <= 0) return "Betting closed";
+    const s = Math.floor(ms / 1000);
+    const m = Math.floor(s / 60);
+    const h = Math.floor(m / 60);
+    const d = Math.floor(h / 24);
+    if (d > 0) return `${d}d ${h % 24}h left`;
+    if (h > 0) return `${h}h ${m % 60}m left`;
+    if (m > 0) return `${m}m ${s % 60}s left`;
+    return `${s}s left`;
+  }, []);
+
+  const [label, setLabel] = useState<string | null>(() => {
+    if (!closesAt) return null;
+    return format(new Date(closesAt).getTime() - Date.now());
+  });
+
+  useEffect(() => {
+    if (!closesAt) { setLabel(null); return; }
+    const tick = () => setLabel(format(new Date(closesAt).getTime() - Date.now()));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [closesAt, format]);
+
+  return label;
+}
+
 function MarketCard({ market }: { market: MarketWithPool }) {
   const yesPercent =
     market.totalPool > 0
       ? Math.round((market.yesPool / market.totalPool) * 100)
       : 50;
   const noPercent = 100 - yesPercent;
+  const countdown = useCountdown(market.status === "open" ? market.closesAt : null);
+  const expired = countdown === "Betting closed";
 
   return (
     <Link href={`/market/${market.id}`}>
@@ -123,6 +155,17 @@ function MarketCard({ market }: { market: MarketWithPool }) {
               }`}
             >
               {market.resolvedOutcome?.toUpperCase()}
+            </span>
+          )}
+          {countdown && (
+            <span
+              className={`ml-3 text-xs px-2 py-0.5 rounded font-medium ${
+                expired
+                  ? "bg-red-900 text-red-300"
+                  : "bg-yellow-900 text-yellow-300"
+              }`}
+            >
+              {countdown}
             </span>
           )}
         </div>

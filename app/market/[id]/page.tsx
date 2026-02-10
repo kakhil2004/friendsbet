@@ -3,6 +3,8 @@ import { readData } from "@/lib/storage";
 import type { Market, Bet } from "@/lib/types";
 import MarketClient from "./MarketClient";
 
+export const dynamic = "force-dynamic";
+
 interface Props {
   params: { id: string };
 }

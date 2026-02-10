@@ -3,6 +3,8 @@ import { readData } from "@/lib/storage";
 import type { User, Bet } from "@/lib/types";
 import ProfileClient from "./ProfileClient";
 
+export const dynamic = "force-dynamic";
+
 interface Props {
   params: { id: string };
 }

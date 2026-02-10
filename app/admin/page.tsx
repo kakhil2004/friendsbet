@@ -30,6 +30,9 @@ export default function AdminPage() {
   const [newClosesAt, setNewClosesAt] = useState("");
   const [editingTimer, setEditingTimer] = useState<string | null>(null);
   const [editTimerValue, setEditTimerValue] = useState("");
+  const [editingBalance, setEditingBalance] = useState<string | null>(null);
+  const [balanceAmount, setBalanceAmount] = useState("");
+  const [giveAllAmount, setGiveAllAmount] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
 
@@ -100,6 +103,33 @@ export default function AdminPage() {
       setError("Failed to resolve market");
       return;
     }
+    fetchData();
+  }
+
+  async function adjustBalance(userId: string, mode: "add" | "set", overrideAmount?: number) {
+    const num = overrideAmount ?? parseInt(balanceAmount, 10);
+    if (isNaN(num)) { setError("Enter a valid number"); return; }
+    const res = await fetch("/api/admin/users/balance", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, amount: num, mode }),
+    });
+    if (!res.ok) { setError("Failed to update balance"); return; }
+    setEditingBalance(null);
+    setBalanceAmount("");
+    fetchData();
+  }
+
+  async function giveAll() {
+    const num = parseInt(giveAllAmount, 10);
+    if (isNaN(num) || num === 0) { setError("Enter a non-zero number"); return; }
+    const res = await fetch("/api/admin/users/balance", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount: num, mode: "add_all" }),
+    });
+    if (!res.ok) { setError("Failed to update balances"); return; }
+    setGiveAllAmount("");
     fetchData();
   }
 
@@ -174,9 +204,27 @@ export default function AdminPage() {
 
       {/* Users List */}
       <section className="bg-gray-900 border border-gray-800 rounded-lg p-6 mb-6">
-        <h2 className="text-xl font-semibold text-gray-200 mb-4">
-          Users ({users.length})
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-gray-200">
+            Users ({users.length})
+          </h2>
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              value={giveAllAmount}
+              onChange={(e) => setGiveAllAmount(e.target.value)}
+              placeholder="Amount"
+              className="w-24 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-gray-100 text-sm placeholder-gray-500 focus:outline-none"
+            />
+            <button
+              onClick={giveAll}
+              disabled={!giveAllAmount}
+              className="px-3 py-1 text-sm bg-primary-700 hover:bg-primary-600 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded transition-colors"
+            >
+              Give All
+            </button>
+          </div>
+        </div>
         {users.length === 0 ? (
           <p className="text-gray-500">No users yet</p>
         ) : (
@@ -184,24 +232,72 @@ export default function AdminPage() {
             {users.map((user) => (
               <div
                 key={user.id}
-                className="flex items-center justify-between bg-gray-800 rounded-md px-4 py-3"
+                className="bg-gray-800 rounded-md px-4 py-3"
               >
-                <div>
-                  <span className="font-medium text-gray-200">
-                    {user.displayName}
-                  </span>
-                  {user.isAdmin && (
-                    <span className="ml-2 text-xs bg-primary-900 text-primary-300 px-2 py-0.5 rounded">
-                      Admin
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium text-gray-200">
+                      {user.displayName}
                     </span>
-                  )}
-                  <p className="text-xs text-gray-500 font-mono mt-1">
-                    Key: {user.walletKey}
-                  </p>
+                    {user.isAdmin && (
+                      <span className="ml-2 text-xs bg-primary-900 text-primary-300 px-2 py-0.5 rounded">
+                        Admin
+                      </span>
+                    )}
+                    <p className="text-xs text-gray-500 font-mono mt-1">
+                      Key: {user.walletKey}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-400 font-mono">
+                      {user.balance} coins
+                    </span>
+                    <button
+                      onClick={() => {
+                        setEditingBalance(editingBalance === user.id ? null : user.id);
+                        setBalanceAmount("");
+                      }}
+                      className="px-2 py-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition-colors"
+                    >
+                      Edit
+                    </button>
+                  </div>
                 </div>
-                <span className="text-gray-400 font-mono">
-                  {user.balance} coins
-                </span>
+                {editingBalance === user.id && (
+                  <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-700">
+                    <input
+                      type="number"
+                      value={balanceAmount}
+                      onChange={(e) => setBalanceAmount(e.target.value)}
+                      placeholder="Amount"
+                      className="w-28 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-gray-100 text-sm placeholder-gray-500 focus:outline-none"
+                    />
+                    <button
+                      onClick={() => adjustBalance(user.id, "add")}
+                      className="px-2 py-1 text-xs bg-green-800 hover:bg-green-700 text-green-200 rounded"
+                    >
+                      +Add
+                    </button>
+                    <button
+                      onClick={() => adjustBalance(user.id, "add", -Math.abs(parseInt(balanceAmount, 10) || 0))}
+                      className="px-2 py-1 text-xs bg-red-800 hover:bg-red-700 text-red-200 rounded"
+                    >
+                      -Remove
+                    </button>
+                    <button
+                      onClick={() => adjustBalance(user.id, "set")}
+                      className="px-2 py-1 text-xs bg-yellow-800 hover:bg-yellow-700 text-yellow-200 rounded"
+                    >
+                      Set To
+                    </button>
+                    <button
+                      onClick={() => { setEditingBalance(null); setBalanceAmount(""); }}
+                      className="px-2 py-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
