@@ -185,12 +185,12 @@ export default function MarketClient({ marketId }: { marketId: string }) {
       </Link>
 
       {/* Market header */}
-      <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 mb-6">
-        <div className="flex items-start justify-between mb-4">
-          <h1 className="text-2xl font-bold text-gray-100">{market.question}</h1>
+      <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 sm:p-6 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-100">{market.question}</h1>
           {market.status === "resolved" && (
             <span
-              className={`ml-3 text-sm px-3 py-1 rounded font-medium shrink-0 ${
+              className={`text-sm px-3 py-1 rounded font-medium shrink-0 ${
                 market.resolvedOutcome === "yes"
                   ? "bg-green-900 text-green-300"
                   : "bg-red-900 text-red-300"
@@ -200,7 +200,7 @@ export default function MarketClient({ marketId }: { marketId: string }) {
             </span>
           )}
           {market.status === "open" && (
-            <span className="ml-3 text-sm px-3 py-1 rounded font-medium bg-primary-900 text-primary-300 shrink-0">
+            <span className="text-sm px-3 py-1 rounded font-medium bg-primary-900 text-primary-300 shrink-0">
               Open
             </span>
           )}
@@ -226,12 +226,12 @@ export default function MarketClient({ marketId }: { marketId: string }) {
 
         {/* Pool visualization */}
         <div className="mb-4">
-          <div className="flex justify-between text-sm mb-2">
+          <div className="flex justify-between text-xs sm:text-sm mb-2">
             <span className="text-green-400 font-medium">
-              Yes — {market.yesPool} coins ({yesPercent}%)
+              Yes {yesPercent}% ({market.yesPool})
             </span>
             <span className="text-red-400 font-medium">
-              No — {market.noPool} coins ({noPercent}%)
+              No {noPercent}% ({market.noPool})
             </span>
           </div>
           <div className="h-6 bg-gray-800 rounded-full overflow-hidden flex">
@@ -338,7 +338,7 @@ export default function MarketClient({ marketId }: { marketId: string }) {
       </div>
 
       {/* Recent bets */}
-      <section className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+      <section className="bg-gray-900 border border-gray-800 rounded-lg p-4 sm:p-6">
         <h2 className="text-lg font-semibold text-gray-200 mb-4">
           Recent Bets
         </h2>
@@ -349,7 +349,7 @@ export default function MarketClient({ marketId }: { marketId: string }) {
             {market.bets.map((bet) => (
               <div
                 key={bet.id}
-                className="flex items-center justify-between bg-gray-800 rounded-md px-4 py-2 text-sm"
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-800 rounded-md px-3 sm:px-4 py-2 text-sm gap-1 sm:gap-0"
               >
                 <div className="flex items-center gap-2">
                   <Link
@@ -369,7 +369,7 @@ export default function MarketClient({ marketId }: { marketId: string }) {
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-gray-400 font-mono">
+                  <span className="text-gray-400 font-mono text-xs sm:text-sm">
                     {bet.amount} coins
                   </span>
                   {bet.payout !== null && (

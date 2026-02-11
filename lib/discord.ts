@@ -14,7 +14,9 @@ interface DiscordEmbed {
 }
 
 export async function sendDiscordNotification(embed: DiscordEmbed): Promise<void> {
-  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+  // Try bot channel first, fall back to webhook
+  const botChannelUrl = process.env.DISCORD_BOT_CHANNEL_WEBHOOK;
+  const webhookUrl = botChannelUrl || process.env.DISCORD_WEBHOOK_URL;
   if (!webhookUrl) return;
 
   try {

@@ -73,11 +73,11 @@ export default function ProfileClient({ userId }: { userId: string }) {
       </Link>
 
       {/* Profile header */}
-      <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 mb-6">
-        <h1 className="text-2xl font-bold text-gray-100 mb-2">
+      <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 sm:p-6 mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-100 mb-2">
           {profile.displayName}
         </h1>
-        <div className="flex gap-6 text-sm">
+        <div className="flex flex-wrap gap-3 sm:gap-6 text-sm">
           <span className="text-primary-400 font-mono font-semibold">
             {profile.balance} coins
           </span>
@@ -92,7 +92,7 @@ export default function ProfileClient({ userId }: { userId: string }) {
 
       {/* Open bets */}
       {openBets.length > 0 && (
-        <section className="bg-gray-900 border border-gray-800 rounded-lg p-6 mb-6">
+        <section className="bg-gray-900 border border-gray-800 rounded-lg p-4 sm:p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-200 mb-4">
             Open Positions ({openBets.length})
           </h2>
@@ -127,7 +127,7 @@ export default function ProfileClient({ userId }: { userId: string }) {
 
       {/* Resolved bets */}
       {resolvedBets.length > 0 && (
-        <section className="bg-gray-900 border border-gray-800 rounded-lg p-6 mb-6">
+        <section className="bg-gray-900 border border-gray-800 rounded-lg p-4 sm:p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-200 mb-4">
             Resolved Bets ({resolvedBets.length})
           </h2>
@@ -171,7 +171,7 @@ export default function ProfileClient({ userId }: { userId: string }) {
       )}
 
       {profile.bets.length === 0 && (
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+        <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 sm:p-6">
           <p className="text-gray-500 text-center">No bets yet.</p>
         </div>
       )}

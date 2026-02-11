@@ -38,13 +38,14 @@ export async function GET(
           (b) => b.marketId === market.id
         );
         const winningOutcome = market.resolvedOutcome;
-        const winningPool = marketBets
-          .filter((b) => b.outcome === winningOutcome)
+        // Exclude house bets from winning pool denominator
+        const realWinningPool = marketBets
+          .filter((b) => b.outcome === winningOutcome && b.userId !== "house")
           .reduce((s, b) => s + b.amount, 0);
         const totalPool = marketBets.reduce((s, b) => s + b.amount, 0);
 
-        if (bet.outcome === winningOutcome && winningPool > 0) {
-          payout = Math.floor((bet.amount / winningPool) * totalPool);
+        if (bet.outcome === winningOutcome && realWinningPool > 0) {
+          payout = Math.floor((bet.amount / realWinningPool) * totalPool);
         } else {
           payout = 0;
         }

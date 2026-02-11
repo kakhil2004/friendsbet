@@ -32,10 +32,14 @@ export async function GET(
 
   const totalPool = yesPool + noPool;
   const winningOutcome = market.resolvedOutcome;
-  const winningPool = winningOutcome === "yes" ? yesPool : winningOutcome === "no" ? noPool : 0;
 
   // Filter out house bets from the displayed feed
   const userBets = marketBets.filter((b) => b.userId !== "house");
+
+  // For payout calculation, use only real user bets on winning side as denominator
+  const realWinningPool = userBets
+    .filter((b) => b.outcome === winningOutcome)
+    .reduce((s, b) => s + b.amount, 0);
 
   const betsWithNames = userBets
     .sort(
@@ -45,9 +49,9 @@ export async function GET(
     .map((bet) => {
       const betUser = users.find((u) => u.id === bet.userId);
       let payout: number | null = null;
-      if (market.status === "resolved" && winningPool > 0 && totalPool > 0) {
+      if (market.status === "resolved" && realWinningPool > 0 && totalPool > 0) {
         if (bet.outcome === winningOutcome) {
-          payout = Math.floor((bet.amount / winningPool) * totalPool);
+          payout = Math.floor((bet.amount / realWinningPool) * totalPool);
         } else {
           payout = 0;
         }

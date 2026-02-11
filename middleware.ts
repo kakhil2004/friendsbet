@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const PUBLIC_PATHS = ["/login", "/api/auth/login"];
-const OG_PATHS = ["/market/", "/profile/"];
+const OG_PATHS = ["/market/", "/profile/", "/leaderboard"];
 
 function isBot(request: NextRequest): boolean {
   const ua = request.headers.get("user-agent") || "";

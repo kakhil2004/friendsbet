@@ -60,11 +60,11 @@ export default function Home() {
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Balance */}
       {user && (
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 mb-8 flex items-center justify-between">
-          <span className="text-gray-400">
+        <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 mb-8 flex items-center justify-between gap-2">
+          <span className="text-gray-400 text-sm sm:text-base truncate">
             Welcome, <span className="text-gray-200 font-medium">{user.displayName}</span>
           </span>
-          <span className="text-primary-400 font-mono font-semibold text-lg">
+          <span className="text-primary-400 font-mono font-semibold text-sm sm:text-lg shrink-0">
             {user.balance} coins
           </span>
         </div>
@@ -143,31 +143,33 @@ function MarketCard({ market }: { market: MarketWithPool }) {
 
   return (
     <Link href={`/market/${market.id}`}>
-      <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-colors cursor-pointer">
-        <div className="flex items-start justify-between mb-3">
-          <p className="font-medium text-gray-200 flex-1">{market.question}</p>
-          {market.status === "resolved" && (
-            <span
-              className={`ml-3 text-xs px-2 py-0.5 rounded font-medium ${
-                market.resolvedOutcome === "yes"
-                  ? "bg-green-900 text-green-300"
-                  : "bg-red-900 text-red-300"
-              }`}
-            >
-              {market.resolvedOutcome?.toUpperCase()}
-            </span>
-          )}
-          {countdown && (
-            <span
-              className={`ml-3 text-xs px-2 py-0.5 rounded font-medium ${
-                expired
-                  ? "bg-red-900 text-red-300"
-                  : "bg-yellow-900 text-yellow-300"
-              }`}
-            >
-              {countdown}
-            </span>
-          )}
+      <div className="bg-gray-900 border border-gray-800 rounded-lg p-3 sm:p-4 hover:border-gray-700 transition-colors cursor-pointer">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-2 mb-3">
+          <p className="font-medium text-gray-200 text-sm sm:text-base flex-1">{market.question}</p>
+          <div className="flex items-center gap-2 shrink-0">
+            {market.status === "resolved" && (
+              <span
+                className={`text-xs px-2 py-0.5 rounded font-medium ${
+                  market.resolvedOutcome === "yes"
+                    ? "bg-green-900 text-green-300"
+                    : "bg-red-900 text-red-300"
+                }`}
+              >
+                {market.resolvedOutcome?.toUpperCase()}
+              </span>
+            )}
+            {countdown && (
+              <span
+                className={`text-xs px-2 py-0.5 rounded font-medium whitespace-nowrap ${
+                  expired
+                    ? "bg-red-900 text-red-300"
+                    : "bg-yellow-900 text-yellow-300"
+                }`}
+              >
+                {countdown}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Pool bar */}

@@ -166,7 +166,7 @@ export default function AdminPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-primary-400">Admin Dashboard</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-primary-400">Admin Dashboard</h1>
         <button
           onClick={() => router.push("/")}
           className="text-gray-400 hover:text-gray-200 text-sm"
@@ -182,7 +182,7 @@ export default function AdminPage() {
       )}
 
       {/* Create User */}
-      <section className="bg-gray-900 border border-gray-800 rounded-lg p-6 mb-6">
+      <section className="bg-gray-900 border border-gray-800 rounded-lg p-4 sm:p-6 mb-6">
         <h2 className="text-xl font-semibold text-gray-200 mb-4">Create User</h2>
         <form onSubmit={createUser} className="flex gap-3">
           <input
@@ -203,8 +203,8 @@ export default function AdminPage() {
       </section>
 
       {/* Users List */}
-      <section className="bg-gray-900 border border-gray-800 rounded-lg p-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
+      <section className="bg-gray-900 border border-gray-800 rounded-lg p-4 sm:p-6 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <h2 className="text-xl font-semibold text-gray-200">
             Users ({users.length})
           </h2>
@@ -219,7 +219,7 @@ export default function AdminPage() {
             <button
               onClick={giveAll}
               disabled={!giveAllAmount}
-              className="px-3 py-1 text-sm bg-primary-700 hover:bg-primary-600 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded transition-colors"
+              className="px-3 py-1 text-sm bg-primary-700 hover:bg-primary-600 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded transition-colors whitespace-nowrap"
             >
               Give All
             </button>
@@ -244,7 +244,7 @@ export default function AdminPage() {
                         Admin
                       </span>
                     )}
-                    <p className="text-xs text-gray-500 font-mono mt-1">
+                    <p className="text-xs text-gray-500 font-mono mt-1 truncate max-w-[150px] sm:max-w-none">
                       Key: {user.walletKey}
                     </p>
                   </div>
@@ -264,35 +264,35 @@ export default function AdminPage() {
                   </div>
                 </div>
                 {editingBalance === user.id && (
-                  <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-700">
+                  <div className="flex flex-wrap items-center gap-2 mt-2 pt-2 border-t border-gray-700">
                     <input
                       type="number"
                       value={balanceAmount}
                       onChange={(e) => setBalanceAmount(e.target.value)}
                       placeholder="Amount"
-                      className="w-28 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-gray-100 text-sm placeholder-gray-500 focus:outline-none"
+                      className="w-24 px-2 py-1.5 bg-gray-700 border border-gray-600 rounded text-gray-100 text-sm placeholder-gray-500 focus:outline-none"
                     />
                     <button
                       onClick={() => adjustBalance(user.id, "add")}
-                      className="px-2 py-1 text-xs bg-green-800 hover:bg-green-700 text-green-200 rounded"
+                      className="px-2 py-1.5 text-xs bg-green-800 hover:bg-green-700 text-green-200 rounded"
                     >
                       +Add
                     </button>
                     <button
                       onClick={() => adjustBalance(user.id, "add", -Math.abs(parseInt(balanceAmount, 10) || 0))}
-                      className="px-2 py-1 text-xs bg-red-800 hover:bg-red-700 text-red-200 rounded"
+                      className="px-2 py-1.5 text-xs bg-red-800 hover:bg-red-700 text-red-200 rounded"
                     >
                       -Remove
                     </button>
                     <button
                       onClick={() => adjustBalance(user.id, "set")}
-                      className="px-2 py-1 text-xs bg-yellow-800 hover:bg-yellow-700 text-yellow-200 rounded"
+                      className="px-2 py-1.5 text-xs bg-yellow-800 hover:bg-yellow-700 text-yellow-200 rounded"
                     >
                       Set To
                     </button>
                     <button
                       onClick={() => { setEditingBalance(null); setBalanceAmount(""); }}
-                      className="px-2 py-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded"
+                      className="px-2 py-1.5 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded"
                     >
                       Cancel
                     </button>
@@ -305,7 +305,7 @@ export default function AdminPage() {
       </section>
 
       {/* Create Market */}
-      <section className="bg-gray-900 border border-gray-800 rounded-lg p-6 mb-6">
+      <section className="bg-gray-900 border border-gray-800 rounded-lg p-4 sm:p-6 mb-6">
         <h2 className="text-xl font-semibold text-gray-200 mb-4">Create Market</h2>
         <form onSubmit={createMarket} className="space-y-3">
           <input
@@ -342,7 +342,7 @@ export default function AdminPage() {
       </section>
 
       {/* Markets List */}
-      <section className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+      <section className="bg-gray-900 border border-gray-800 rounded-lg p-4 sm:p-6">
         <h2 className="text-xl font-semibold text-gray-200 mb-4">
           Markets ({markets.length})
         </h2>
@@ -353,9 +353,9 @@ export default function AdminPage() {
             {markets.map((market) => (
               <div
                 key={market.id}
-                className="bg-gray-800 rounded-md px-4 py-3"
+                className="bg-gray-800 rounded-md px-3 sm:px-4 py-3"
               >
-                <div className="flex items-start justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-gray-200">
                       {market.question}
@@ -376,7 +376,7 @@ export default function AdminPage() {
                       )}
                     </p>
                     {market.status === "open" && editingTimer === market.id && (
-                      <div className="flex gap-2 mt-2">
+                      <div className="flex flex-wrap gap-2 mt-2">
                         <input
                           type="datetime-local"
                           value={editTimerValue}
@@ -398,7 +398,7 @@ export default function AdminPage() {
                       </div>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 ml-4 shrink-0">
+                  <div className="flex items-center gap-2 shrink-0 flex-wrap">
                     {market.status === "open" && (
                       <>
                         <button

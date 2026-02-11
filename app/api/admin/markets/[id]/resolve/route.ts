@@ -59,17 +59,17 @@ export async function POST(
 
   const winningOutcome = outcome as "yes" | "no";
   const winningBets = marketBets.filter((b) => b.outcome === winningOutcome);
-  const winningPool = winningBets.reduce((s, b) => s + b.amount, 0);
   const totalPool = marketBets.reduce((s, b) => s + b.amount, 0);
 
   // Build payout map: userId -> amount to credit (skip house bets)
+  // Use only real user bets as denominator so house bonus doesn't dilute payouts
   const payouts: Record<string, number> = {};
   const realWinningBets = winningBets.filter((b) => b.userId !== "house");
+  const realWinningPool = realWinningBets.reduce((s, b) => s + b.amount, 0);
 
-  if (winningPool > 0 && totalPool > 0) {
+  if (realWinningPool > 0 && totalPool > 0) {
     for (const bet of realWinningBets) {
-      // Proportional share: (bet.amount / winningPool) * totalPool
-      const payout = Math.floor((bet.amount / winningPool) * totalPool);
+      const payout = Math.floor((bet.amount / realWinningPool) * totalPool);
       payouts[bet.userId] = (payouts[bet.userId] || 0) + payout;
     }
   }
@@ -88,6 +88,7 @@ export async function POST(
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const winningPool = winningBets.reduce((s, b) => s + b.amount, 0);
   const losingPool = totalPool - winningPool;
   const winnerCount = Object.keys(payouts).length;
 
